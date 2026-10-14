@@ -7,6 +7,7 @@ import 'core/router/app_router.dart';
 import 'core/state/auth_controller.dart';
 import 'core/state/visit_status_controller.dart';
 import 'core/theme/app_theme.dart';
+import 'features/booking/booking_controller.dart';
 import 'features/home/data/home_repository.dart';
 
 /// Akar aplikasi: menyediakan state dan repository bersama, lalu memasang router.
@@ -40,6 +41,7 @@ class _MuseumAppState extends State<MuseumApp> {
       providers: [
         ChangeNotifierProvider<AuthController>.value(value: widget.authController),
         ChangeNotifierProvider<VisitStatusController>(create: (_) => VisitStatusController()),
+        ChangeNotifierProvider<BookingController>(create: (_) => BookingController()),
         Provider<HomeRepository>.value(value: widget.homeRepository ?? const DummyHomeRepository()),
       ],
       child: AnnotatedRegion<SystemUiOverlayStyle>(
