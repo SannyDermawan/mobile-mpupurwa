@@ -9,6 +9,7 @@ import '../../features/booking/booking_page.dart';
 import '../../features/booking/status_booking_page.dart';
 import '../../features/collections/katalog_page.dart';
 import '../../features/collections/koleksi_detail_page.dart';
+import '../../features/collections/koleksi_model.dart';
 import '../../features/home/beranda_page.dart';
 import '../../features/info/info_page.dart';
 import '../../features/profile/profile_page.dart';
@@ -85,12 +86,18 @@ GoRouter createAppRouter(AuthController auth) {
               GoRoute(
                 path: AppRoutes.katalog,
                 name: AppRoutes.katalogName,
-                builder: (context, state) => KatalogPage(era: state.uri.queryParameters['era']),
+                builder: (context, state) => const KatalogScreen(),
               ),
               GoRoute(
                 path: AppRoutes.koleksi,
                 name: AppRoutes.koleksiName,
-                builder: (context, state) => KoleksiDetailPage(id: state.pathParameters['id']!),
+                builder: (context, state) {
+                  final koleksi = state.extra as Koleksi?;
+                  if (koleksi == null) {
+                    return const KatalogScreen();
+                  }
+                  return KoleksiDetailPage(koleksi: koleksi);
+                },
               ),
             ],
           ),
