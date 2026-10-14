@@ -43,7 +43,7 @@ class _KatalogScreenState extends State<KatalogScreen> {
         periode: 'Abad 13',
         material: 'Batu Andesit',
         sejarah: 'Arca Ganesha dengan hiasan motif tikus.',
-        fotoUrl: 'https://images.unsplash.com/photo-1590059300620-e298533e4b37?q=80&w=400',
+        fotoUrl: '',
       ),
       Koleksi(
         id: '2',
@@ -53,7 +53,7 @@ class _KatalogScreenState extends State<KatalogScreen> {
         periode: 'Abad 8',
         material: 'Batu Andesit',
         sejarah: 'Arca Dewa Brahma berkepala empat.',
-        fotoUrl: 'https://images.unsplash.com/photo-1565008447742-97f6f38c985c?q=80&w=400',
+        fotoUrl: '',
       ),
       Koleksi(
         id: '3',
@@ -83,7 +83,7 @@ class _KatalogScreenState extends State<KatalogScreen> {
         periode: 'Abad 10',
         material: 'Batu',
         sejarah: 'Prasasti peninggalan kerajaan Kanjuruhan.',
-        fotoUrl: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?q=80&w=400',
+        fotoUrl: '',
       ),
       Koleksi(
         id: '6',
