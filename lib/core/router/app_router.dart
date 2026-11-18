@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/auth/auth_gate_page.dart';
-import '../../features/auth/login_page.dart';
-import '../../features/auth/otp_page.dart';
-import '../../features/auth/register_page.dart';
-import '../../features/booking/booking_page.dart';
-import '../../features/booking/status_booking_page.dart';
-import '../../features/collections/katalog_page.dart';
-import '../../features/collections/koleksi_detail_page.dart';
-import '../../features/collections/koleksi_model.dart';
-import '../../features/home/beranda_page.dart';
-import '../../features/info/info_page.dart';
-import '../../features/profile/profile_page.dart';
-import '../../features/visit/kunjungan_tercatat_page.dart';
-import '../../features/visit/scan_qr_page.dart';
-import '../state/auth_controller.dart';
+import '../../features/auth/view/auth_gate_page.dart';
+import '../../features/auth/view/login_page.dart';
+import '../../features/auth/view/otp_page.dart';
+import '../../features/auth/view/register_page.dart';
+import '../../features/auth/viewmodel/auth_view_model.dart';
+import '../../features/booking/view/booking_page.dart';
+import '../../features/booking/view/status_booking_page.dart';
+import '../../features/collections/model/koleksi_model.dart';
+import '../../features/collections/view/katalog_page.dart';
+import '../../features/collections/view/koleksi_detail_page.dart';
+import '../../features/home/view/beranda_page.dart';
+import '../../features/info/view/info_page.dart';
+import '../../features/profile/view/profile_page.dart';
+import '../../features/visit/view/kunjungan_tercatat_page.dart';
+import '../../features/visit/view/scan_qr_page.dart';
 import 'app_routes.dart';
 import 'main_shell.dart';
 
@@ -28,7 +28,7 @@ import 'main_shell.dart';
 /// **Menambah halaman.** Layar milik tab bernavbar didaftarkan sebagai
 /// `GoRoute` di salah satu `StatefulShellBranch` di bawah. Path dibuat
 /// absolut (diawali `/`) dan dipakai lewat [AppRoutes].
-GoRouter createAppRouter(AuthController auth) {
+GoRouter createAppRouter(AuthViewModel auth) {
   return GoRouter(
     initialLocation: AppRoutes.authgate,
     refreshListenable: auth,
@@ -86,7 +86,8 @@ GoRouter createAppRouter(AuthController auth) {
               GoRoute(
                 path: AppRoutes.katalog,
                 name: AppRoutes.katalogName,
-                builder: (context, state) => const KatalogScreen(),
+                builder: (context, state) =>
+                    KatalogScreen(initialEra: state.uri.queryParameters['era']),
               ),
               GoRoute(
                 path: AppRoutes.koleksi,
@@ -156,7 +157,7 @@ GoRouter createAppRouter(AuthController auth) {
 class _NotFoundPage extends StatelessWidget {
   const _NotFoundPage({required this.auth});
 
-  final AuthController auth;
+  final AuthViewModel auth;
 
   @override
   Widget build(BuildContext context) {

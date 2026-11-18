@@ -1,8 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:museum_mpupurwa_app/app.dart';
-import 'package:museum_mpupurwa_app/core/state/auth_controller.dart';
+import 'package:museum_mpupurwa_app/features/auth/viewmodel/auth_view_model.dart';
 import 'package:museum_mpupurwa_app/core/storage/session_storage.dart';
+import 'package:museum_mpupurwa_app/features/auth/repository/local_auth_repository.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
@@ -13,8 +14,8 @@ void main() {
   });
 
   testWidgets('aplikasi terbuka di Auth Gate dan tombol Masuk membuka Login', (tester) async {
-    final auth = AuthController(await SessionStorage.create());
-    await tester.pumpWidget(MuseumApp(authController: auth));
+    final auth = AuthViewModel(LocalAuthRepository(await SessionStorage.create()));
+    await tester.pumpWidget(MuseumApp(authViewModel: auth));
     await tester.pumpAndSettle();
 
     expect(find.text('Selamat datang di Museum Mpu Purwa'), findsOneWidget);

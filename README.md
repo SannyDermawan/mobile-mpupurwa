@@ -31,27 +31,32 @@ flutter build apk --debug
 
 ## Struktur folder
 
+Aplikasi memakai arsitektur **MVVM + Repository** dengan struktur *feature-first*
+(penjelasan lengkap dan bahan presentasi: [`docs/PRESENTASI_MVVM.md`](docs/PRESENTASI_MVVM.md)).
+
 ```
 lib/
   main.dart                 titik masuk, memulihkan sesi login
-  app.dart                  MaterialApp.router + Provider (state dan repository)
-  core/                     fondasi bersama (milik Leader)
-    theme/                  app_colors, app_text_styles, app_theme, app_dimens
-    router/                 app_router, app_routes, main_shell (navbar)
-    widgets/                komponen UI bersama
+  app.dart                  composition root: MaterialApp.router + Provider (DI)
+  core/                     fondasi bersama (tema, router, widget, service)
+    theme/  router/  widgets/  constants/  utils/
     network/                api_config, api_client (dio)
-    constants/              app_images, museum_hours
     storage/                session_storage (shared_preferences)
-    state/                  auth_controller, visit_status_controller, visitor_profile
-  features/
-    auth/                   Auth Gate, Login, Register, OTP        (Leader)
-    home/                   Beranda                                (Leader)
-    collections/            Katalog, Detail Koleksi                (Teman 1)
-    info/                   Kunjungan & Lokasi                     (Teman 1)
-    profile/                Profil Saya                            (Teman 1)
-    visit/                  Scan QR, Kunjungan Tercatat            (Teman 2)
-    booking/                Booking Rombongan, Status Booking      (Teman 2)
+    services/               link_launcher (url_launcher)
+  features/<fitur>/         satu folder per fitur, isinya per peran MVVM
+    model/                  Model: kelas data
+    repository/             Repository: antarmuka + implementasi (dummy / lokal)
+    viewmodel/              ViewModel: state layar + logika presentasi (ChangeNotifier)
+    view/                   View: Page dan widget, hanya menampilkan
+      auth/                 Auth Gate, Login, Register, OTP        (Leader)
+      home/                 Beranda                                (Leader)
+      collections/          Katalog, Detail Koleksi                (Teman 1)
+      info/                 Kunjungan & Lokasi                     (Teman 1)
+      profile/              Profil Saya                            (Teman 1)
+      visit/                Scan QR, Kunjungan Tercatat            (Teman 2)
+      booking/              Booking Rombongan, Status Booking      (Teman 2)
 assets/images/              foto koleksi (diekstrak dari HTML desain)
+test/                       test widget dan test ViewModel (test/viewmodel/)
 ```
 
 ## Pemilik folder
@@ -104,11 +109,11 @@ context.go(AppRoutes.katalogDenganEra('Tumapel')); // /katalog?era=Tumapel
   `AppTopBar(fallbackRoute: ...)` supaya tahu harus ke mana (di HTML: Detail kembali ke Katalog,
   layar lain kembali ke Beranda).
 - **Guard login**: belum login hanya bisa ke `authgate/login/register/otp`; sudah login diarahkan
-  ke `beranda`. Logout cukup `context.read<AuthController>().logout()`, router yang memindahkan layar.
+  ke `beranda`. Logout cukup `context.read<AuthViewModel>().logout()`, router yang memindahkan layar.
 - **Era di Katalog**: `?era=` berisi `Kanjuruhan`, `Tumapel`, `Singosari`, atau `Prasasti`.
-  Baca lewat `GoRouterState.uri.queryParameters['era']` (sudah diteruskan ke `KatalogPage(era: ...)`).
-  Saat Katalog sudah terbuka lalu `era` berubah, widget yang sama dibangun ulang, jadi tangani
-  perubahan lewat `didUpdateWidget`.
+  Router meneruskannya ke `KatalogScreen(initialEra: ...)`, lalu `KatalogViewModel` memilih chip
+  era yang sesuai (nilai yang tidak dikenal diabaikan). `KatalogScreen` memakai `ValueKey(initialEra)`
+  sehingga ViewModel dibuat ulang kalau era dari rute berubah.
 
 ### Mendaftarkan halaman baru
 
@@ -145,31 +150,35 @@ AppButton(label: 'Kirim', onPressed: () {})
 Text('Judul', style: AppTextStyles.sectionTitle)
 ```
 
-## State bersama
+## ViewModel bersama
 
-- `AuthController` (`context.watch<AuthController>()`): `isLoggedIn`, `profile` (`VisitorProfile`),
-  `login()`, `logout()`, `updateProfile(...)`. Sesi tersimpan di perangkat. Data pengguna saat ini
-  dummy (Amanda Putri, sesuai HTML).
-- `VisitStatusController`: `visitRecordedToday`. **Teman 2** memanggil
-  `context.read<VisitStatusController>().markVisitRecorded()` saat scan QR berhasil; banner di
+- `AuthViewModel` (`context.watch<AuthViewModel>()`): `isLoggedIn`, `profile` (`VisitorProfile`),
+  `login()`, `logout()`, `updateProfile(...)`. Sesi tersimpan di perangkat lewat `AuthRepository`.
+  Data pengguna saat ini dummy (Amanda Putri, sesuai HTML).
+- `VisitStatusViewModel`: `visitRecordedToday`. **Teman 2** memanggil
+  `context.read<VisitStatusViewModel>().markVisitRecorded()` saat scan QR berhasil; banner di
   Beranda otomatis berubah menjadi "Kunjungan hari ini tercatat."
+- `BookingViewModel`: daftar pengajuan booking, aturan validasi form, dan aturan tanggal kunjungan.
+
+ViewModel milik satu layar (mis. `KatalogViewModel`, `OtpViewModel`) dibuat oleh layarnya sendiri.
 
 ## Repository dummy
 
-Layar tidak boleh memegang data statis sendiri. Data diambil lewat repository (antarmuka abstrak
-+ implementasi dummy) yang disediakan di `app.dart` lewat `Provider`. Contoh yang sudah ada:
-`features/home/data/home_repository.dart` (`HomeRepository` dan `DummyHomeRepository`).
+Layar dan ViewModel tidak boleh memegang data statis sendiri. Data diambil lewat repository
+(antarmuka abstrak + implementasi dummy) yang disediakan di `app.dart` lewat `Provider`.
+Contoh: `features/home/repository/home_repository.dart` (`HomeRepository` dan
+`DummyHomeRepository`) dan `features/collections/repository/` (`KoleksiRepository`).
 
 ```dart
-// di layar:
-final repo = context.read<HomeRepository>();
-final content = await repo.loadContent();
+// di ViewModel (bukan di View):
+final content = await _repository.loadContent();
 ```
 
-Pola untuk layarmu: buat `xxx_repository.dart` berisi `abstract class XxxRepository` dan
-`DummyXxxRepository` dengan data dari HTML, daftarkan di `app.dart`. Saat backend untuk aplikasi
-mobile siap, buat implementasi yang memakai `ApiClient` (`core/network/`) dan ganti satu baris
-di `app.dart`; UI tidak perlu diubah.
+Pola untuk fitur baru: buat `model/`, `repository/xxx_repository.dart` (`abstract class
+XxxRepository` + `DummyXxxRepository` dengan data dari HTML), `viewmodel/xxx_view_model.dart`
+(`ChangeNotifier`), lalu `view/xxx_page.dart`; daftarkan repository di `app.dart`. Saat backend
+untuk aplikasi mobile siap, buat implementasi yang memakai `ApiClient` (`core/network/`) dan
+ganti satu baris di `app.dart`; ViewModel dan View tidak perlu diubah.
 
 Kontrak dengan layar lain: **id koleksi** (`ganesya`, `brahma`, `catur`, `makara`, `prasasti`,
 `nandi`) dipakai untuk membuka `/koleksi/:id`. Beranda hanya memakai model kecilnya sendiri

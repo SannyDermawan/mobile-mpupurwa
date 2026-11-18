@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 import 'app.dart';
-import 'core/state/auth_controller.dart';
 import 'core/storage/session_storage.dart';
+import 'features/auth/repository/local_auth_repository.dart';
+import 'features/auth/viewmodel/auth_view_model.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,8 +11,8 @@ Future<void> main() async {
   // Pulihkan sesi login sebelum UI muncul, supaya pengguna yang sudah masuk
   // tidak sempat melihat layar Auth Gate.
   final storage = await SessionStorage.create();
-  final authController = AuthController(storage);
-  await authController.restore();
+  final authViewModel = AuthViewModel(LocalAuthRepository(storage));
+  await authViewModel.restore();
 
-  runApp(MuseumApp(authController: authController));
+  runApp(MuseumApp(authViewModel: authViewModel));
 }

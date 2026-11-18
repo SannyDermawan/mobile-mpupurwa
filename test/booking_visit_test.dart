@@ -4,16 +4,17 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:museum_mpupurwa_app/app.dart';
 import 'package:museum_mpupurwa_app/core/router/app_routes.dart';
-import 'package:museum_mpupurwa_app/core/state/auth_controller.dart';
-import 'package:museum_mpupurwa_app/core/state/visit_status_controller.dart';
+import 'package:museum_mpupurwa_app/features/auth/viewmodel/auth_view_model.dart';
+import 'package:museum_mpupurwa_app/features/visit/viewmodel/visit_status_view_model.dart';
 import 'package:museum_mpupurwa_app/core/storage/session_storage.dart';
+import 'package:museum_mpupurwa_app/features/auth/repository/local_auth_repository.dart';
 import 'package:museum_mpupurwa_app/core/theme/app_theme.dart';
-import 'package:museum_mpupurwa_app/features/booking/booking_controller.dart';
-import 'package:museum_mpupurwa_app/features/booking/booking_model.dart';
-import 'package:museum_mpupurwa_app/features/booking/status_booking_page.dart';
-import 'package:museum_mpupurwa_app/features/booking/tanggal_format.dart';
-import 'package:museum_mpupurwa_app/features/home/beranda_page.dart';
-import 'package:museum_mpupurwa_app/features/visit/kunjungan_tercatat_page.dart';
+import 'package:museum_mpupurwa_app/features/booking/viewmodel/booking_view_model.dart';
+import 'package:museum_mpupurwa_app/features/booking/model/booking_model.dart';
+import 'package:museum_mpupurwa_app/features/booking/view/status_booking_page.dart';
+import 'package:museum_mpupurwa_app/core/utils/tanggal_format.dart';
+import 'package:museum_mpupurwa_app/features/home/view/beranda_page.dart';
+import 'package:museum_mpupurwa_app/features/visit/view/kunjungan_tercatat_page.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -31,15 +32,15 @@ void main() {
     addTearDown(tester.view.reset);
   }
 
-  Future<AuthController> loggedInAuth() async {
-    final auth = AuthController(await SessionStorage.create());
+  Future<AuthViewModel> loggedInAuth() async {
+    final auth = AuthViewModel(LocalAuthRepository(await SessionStorage.create()));
     await auth.login();
     return auth;
   }
 
   Future<void> pumpApp(WidgetTester tester) async {
     usePhoneScreen(tester);
-    await tester.pumpWidget(MuseumApp(authController: await loggedInAuth()));
+    await tester.pumpWidget(MuseumApp(authViewModel: await loggedInAuth()));
     await tester.pumpAndSettle();
   }
 
@@ -78,15 +79,15 @@ void main() {
     });
   });
 
-  group('BookingController', () {
+  group('BookingViewModel', () {
     test('kosong di awal', () {
-      final controller = BookingController();
+      final controller = BookingViewModel();
       expect(controller.requests, isEmpty);
       expect(controller.latest, isNull);
     });
 
     test('pengajuan terbaru ada di urutan pertama dan pendengar diberi tahu', () {
-      final controller = BookingController();
+      final controller = BookingViewModel();
       var notified = 0;
       controller.addListener(() => notified++);
 
@@ -130,7 +131,7 @@ void main() {
 
       expect(find.text('Kamera belum berfungsi'), findsNothing);
       expect(find.text('Konfirmasi Kunjungan'), findsOneWidget);
-      final visit = tester.element(find.text('Konfirmasi Kunjungan')).read<VisitStatusController>();
+      final visit = tester.element(find.text('Konfirmasi Kunjungan')).read<VisitStatusViewModel>();
       expect(visit.visitRecordedToday, isFalse);
     });
 
@@ -152,7 +153,7 @@ void main() {
         expect(find.text('Mulai Jelajahi Koleksi'), findsOneWidget);
         final visit = tester
             .element(find.text('Kunjungan Tercatat!'))
-            .read<VisitStatusController>();
+            .read<VisitStatusViewModel>();
         expect(visit.visitRecordedToday, isTrue);
 
         await tester.tap(find.text('Beranda'));
@@ -164,7 +165,7 @@ void main() {
   });
 
   group('Kunjungan Tercatat', () {
-    Future<void> pumpPage(WidgetTester tester, AuthController auth) async {
+    Future<void> pumpPage(WidgetTester tester, AuthViewModel auth) async {
       usePhoneScreen(tester);
       final router = GoRouter(
         initialLocation: AppRoutes.kunjunganTercatat,
@@ -181,7 +182,7 @@ void main() {
       );
       addTearDown(router.dispose);
       await tester.pumpWidget(
-        ChangeNotifierProvider<AuthController>.value(
+        ChangeNotifierProvider<AuthViewModel>.value(
           value: auth,
           child: MaterialApp.router(theme: AppTheme.light, routerConfig: router),
         ),
@@ -202,7 +203,7 @@ void main() {
     testWidgets('tanpa profil, baris pengunjung disembunyikan tetapi tanggal tetap tampil', (
       tester,
     ) async {
-      await pumpPage(tester, AuthController(await SessionStorage.create()));
+      await pumpPage(tester, AuthViewModel(LocalAuthRepository(await SessionStorage.create())));
 
       expect(find.text('Pengunjung'), findsNothing);
       expect(find.text('Rabu, 14 Oktober 2026'), findsOneWidget);
@@ -272,7 +273,7 @@ void main() {
       expect(find.text('Nomor HP wajib diisi.'), findsOneWidget);
       // Catatan opsional, tidak boleh ikut error.
       expect(find.text('Catatan wajib diisi.'), findsNothing);
-      expect(tester.element(field(0)).read<BookingController>().requests, isEmpty);
+      expect(tester.element(field(0)).read<BookingViewModel>().requests, isEmpty);
       expect(find.text('Kirim Pengajuan'), findsOneWidget);
     });
 
@@ -319,7 +320,7 @@ void main() {
       expect(find.text('Butuh pemandu'), findsOneWidget);
       expect(find.text('35 peserta'), findsOneWidget);
 
-      final saved = tester.element(find.text('Status Booking')).read<BookingController>().latest!;
+      final saved = tester.element(find.text('Status Booking')).read<BookingViewModel>().latest!;
       expect(saved.institution, 'SMA Negeri 1 Malang');
       expect(saved.participants, 35);
       expect(saved.visitDate, firstBookableDay());
@@ -351,9 +352,9 @@ void main() {
       await openStatusFromBooking(tester);
       expect(find.text('Belum ada pengajuan booking'), findsOneWidget);
 
-      tester
+      await tester
           .element(find.byType(StatusBookingPage))
-          .read<BookingController>()
+          .read<BookingViewModel>()
           .submit(sampleRequest(institution: 'Universitas Brawijaya'));
       await tester.pumpAndSettle();
 
@@ -369,10 +370,10 @@ void main() {
       tester,
     ) async {
       await openStatusFromBooking(tester);
-      final controller = tester.element(find.byType(StatusBookingPage)).read<BookingController>();
+      final controller = tester.element(find.byType(StatusBookingPage)).read<BookingViewModel>();
 
-      controller.submit(sampleRequest(institution: 'SMP Lama'));
-      controller.submit(sampleRequest(institution: 'SMA Baru'));
+      await controller.submit(sampleRequest(institution: 'SMP Lama'));
+      await controller.submit(sampleRequest(institution: 'SMA Baru'));
       await tester.pumpAndSettle();
 
       // Terbaru muncul di kartu status, di tabel info, dan di riwayat; yang lama hanya di riwayat.
@@ -385,9 +386,9 @@ void main() {
     testWidgets('nama instansi panjang tidak membuat tampilan overflow', (tester) async {
       await openStatusFromBooking(tester);
 
-      tester
+      await tester
           .element(find.byType(StatusBookingPage))
-          .read<BookingController>()
+          .read<BookingViewModel>()
           .submit(
             sampleRequest(
               institution: 'Sekolah Menengah Atas Negeri Unggulan Terpadu Kota Malang Raya',

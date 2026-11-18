@@ -4,30 +4,59 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import 'core/router/app_router.dart';
-import 'core/state/auth_controller.dart';
-import 'core/state/visit_status_controller.dart';
+import 'core/services/link_launcher.dart';
 import 'core/theme/app_theme.dart';
-import 'features/booking/booking_controller.dart';
-import 'features/home/data/home_repository.dart';
+import 'features/auth/viewmodel/auth_view_model.dart';
+import 'features/booking/repository/booking_repository.dart';
+import 'features/booking/viewmodel/booking_view_model.dart';
+import 'features/collections/repository/dummy_koleksi_repository.dart';
+import 'features/collections/repository/koleksi_repository.dart';
+import 'features/home/repository/home_repository.dart';
+import 'features/visit/repository/visit_repository.dart';
+import 'features/visit/viewmodel/visit_status_view_model.dart';
 
-/// Akar aplikasi: menyediakan state dan repository bersama, lalu memasang router.
+/// Akar aplikasi (composition root): satu-satunya tempat yang merakit
+/// dependensi, lalu memasang router.
 ///
-/// Repository dummy disediakan lewat `Provider<HomeRepository>`; ganti dengan
-/// implementasi API di sini nanti tanpa mengubah layar.
+/// Alur dependensi MVVM:
+///
+/// ```text
+/// View ──► ViewModel ──► Repository (antarmuka) ──► Service / data
+/// ```
+///
+/// - Repository dan service disediakan lewat `Provider`. Mengganti data dummy
+///   dengan API cukup dilakukan di sini, tanpa menyentuh ViewModel atau View.
+/// - ViewModel yang dipakai banyak layar (`AuthViewModel`, `BookingViewModel`,
+///   `VisitStatusViewModel`) disediakan di sini. ViewModel milik satu layar
+///   dibuat oleh layarnya sendiri.
+/// - Semua parameter repository bersifat opsional supaya test bisa
+///   menggantinya dengan data palsu.
 class MuseumApp extends StatefulWidget {
-  const MuseumApp({super.key, required this.authController, this.homeRepository});
+  const MuseumApp({
+    super.key,
+    required this.authViewModel,
+    this.homeRepository,
+    this.koleksiRepository,
+    this.visitRepository,
+    this.bookingRepository,
+    this.linkLauncher,
+  });
 
-  final AuthController authController;
+  final AuthViewModel authViewModel;
 
-  /// Diisi di test untuk mengganti data Beranda; default memakai data dummy.
   final HomeRepository? homeRepository;
+  final KoleksiRepository? koleksiRepository;
+  final VisitRepository? visitRepository;
+  final BookingRepository? bookingRepository;
+  final LinkLauncher? linkLauncher;
 
   @override
   State<MuseumApp> createState() => _MuseumAppState();
 }
 
 class _MuseumAppState extends State<MuseumApp> {
-  late final GoRouter _router = createAppRouter(widget.authController);
+  late final GoRouter _router = createAppRouter(widget.authViewModel);
+  late final VisitRepository _visitRepository = widget.visitRepository ?? InMemoryVisitRepository();
 
   @override
   void dispose() {
@@ -39,10 +68,22 @@ class _MuseumAppState extends State<MuseumApp> {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider<AuthController>.value(value: widget.authController),
-        ChangeNotifierProvider<VisitStatusController>(create: (_) => VisitStatusController()),
-        ChangeNotifierProvider<BookingController>(create: (_) => BookingController()),
+        // --- Service & Repository (lapisan data) ---
         Provider<HomeRepository>.value(value: widget.homeRepository ?? const DummyHomeRepository()),
+        Provider<KoleksiRepository>.value(
+          value: widget.koleksiRepository ?? const DummyKoleksiRepository(),
+        ),
+        Provider<VisitRepository>.value(value: _visitRepository),
+        Provider<LinkLauncher>.value(value: widget.linkLauncher ?? const UrlLauncherService()),
+
+        // --- ViewModel bersama (lapisan UI) ---
+        ChangeNotifierProvider<AuthViewModel>.value(value: widget.authViewModel),
+        ChangeNotifierProvider<VisitStatusViewModel>(
+          create: (_) => VisitStatusViewModel(repository: _visitRepository),
+        ),
+        ChangeNotifierProvider<BookingViewModel>(
+          create: (_) => BookingViewModel(repository: widget.bookingRepository)..load(),
+        ),
       ],
       child: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.dark.copyWith(

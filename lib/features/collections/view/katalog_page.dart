@@ -1,0 +1,259 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import 'koleksi_detail_page.dart';
+import '../model/koleksi_model.dart';
+import '../repository/koleksi_repository.dart';
+import '../viewmodel/katalog_view_model.dart';
+
+/// Layar Katalog Koleksi. View hanya menampilkan state dari
+/// [KatalogViewModel] dan meneruskan ketikan pencarian serta pilihan era.
+class KatalogScreen extends StatelessWidget {
+  const KatalogScreen({Key? key, this.initialEra}) : super(key: key);
+
+  /// Era yang langsung terpilih, dari query `?era=`. Kosong berarti "Semua".
+  final String? initialEra;
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider<KatalogViewModel>(
+      // Key membuat ViewModel dibuat ulang kalau era dari rute berubah.
+      key: ValueKey(initialEra),
+      create: (context) =>
+          KatalogViewModel(context.read<KoleksiRepository>(), initialEra: initialEra)..load(),
+      child: const _KatalogView(),
+    );
+  }
+}
+
+class _KatalogView extends StatefulWidget {
+  const _KatalogView();
+
+  @override
+  State<_KatalogView> createState() => _KatalogViewState();
+}
+
+class _KatalogViewState extends State<_KatalogView> {
+  // Ephemeral state: controller kolom pencarian hanya dipakai widget ini.
+  final TextEditingController _searchController = TextEditingController();
+
+  // Warna sesuai Desain UI
+  static const Color primaryGold = Color(0xFFD4A017); // Warna Emas/Kuning
+  static const Color goldLight = Color(0xFFE8C86A);
+  static const Color bgGrey = Color(0xFFF9F9F9);
+  static const Color cardDark = Color(0xFF1F1F1F); // Background placeholder icon
+  static const Color textDark = Color(0xFF1A1A1A);
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final vm = context.watch<KatalogViewModel>();
+    final items = vm.filtered;
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(height: 16),
+            // Header Title
+            const Text(
+              "Katalog Koleksi",
+              style: TextStyle(
+                fontFamily: 'Serif', // Menggunakan font serif
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: textDark,
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // 1. Search Bar (Bulat Halus)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: bgGrey,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: Colors.grey.shade300, width: 0.8),
+                ),
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: vm.search,
+                  decoration: const InputDecoration(
+                    hintText: "Cari nama koleksi...",
+                    hintStyle: TextStyle(color: Colors.grey, fontSize: 14),
+                    prefixIcon: Icon(Icons.search, color: Colors.grey, size: 20),
+                    border: InputBorder.none,
+                    contentPadding: EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // 2. Chip Filter Era
+            SizedBox(
+              height: 38,
+              child: ListView.builder(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                itemCount: KatalogViewModel.eraOptions.length,
+                itemBuilder: (context, index) {
+                  final era = KatalogViewModel.eraOptions[index];
+                  final isSelected = vm.selectedEra == era;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8.0),
+                    child: GestureDetector(
+                      onTap: () => vm.selectEra(era),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: isSelected ? goldLight : Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: isSelected ? goldLight : Colors.grey.shade300,
+                            width: 1,
+                          ),
+                        ),
+                        child: Text(
+                          era,
+                          style: TextStyle(
+                            color: isSelected ? textDark : Colors.grey.shade700,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // 3. Grid 2 Kolom
+            Expanded(
+              child: vm.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : items.isEmpty
+                  ? const Center(
+                      child: Text("Koleksi tidak ditemukan", style: TextStyle(color: Colors.grey)),
+                    )
+                  : GridView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                        crossAxisSpacing: 14,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: 0.76,
+                      ),
+                      itemCount: items.length,
+                      itemBuilder: (context, index) {
+                        final item = items[index];
+                        return _buildCollectionCard(item);
+                      },
+                    ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Widget Kartu Koleksi Sesui UI
+  Widget _buildCollectionCard(Koleksi item) {
+    final bool hasImage = item.fotoUrl.isNotEmpty;
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => KoleksiDetailPage(koleksi: item)),
+        );
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          color: bgGrey,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: Colors.grey.shade200),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Gambar / Icon Placeholder
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: hasImage ? Colors.transparent : cardDark,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                ),
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+                  child: hasImage
+                      ? Image.network(
+                          item.fotoUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, __, ___) =>
+                              _buildPlaceholderIcon(index: int.tryParse(item.id) ?? 1),
+                        )
+                      : _buildPlaceholderIcon(index: int.tryParse(item.id) ?? 1),
+                ),
+              ),
+            ),
+
+            // Teks Era dan Nama Koleksi
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.era.toUpperCase(),
+                    style: const TextStyle(
+                      color: primaryGold,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    item.nama,
+                    style: const TextStyle(
+                      fontFamily: 'Serif',
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                      color: textDark,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Icon Vektor Emas untuk item tanpa gambar (seperti Siwa Catur Muka & Makara Gapura)
+  Widget _buildPlaceholderIcon({required int index}) {
+    IconData iconData;
+    if (index % 3 == 0) {
+      iconData = Icons.article_outlined;
+    } else if (index % 3 == 1) {
+      iconData = Icons.change_history_outlined;
+    } else {
+      iconData = Icons.all_inclusive_outlined;
+    }
+
+    return Center(child: Icon(iconData, size: 38, color: primaryGold));
+  }
+}
