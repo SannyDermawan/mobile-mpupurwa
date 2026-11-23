@@ -11,7 +11,8 @@
     "videoUrl": "https://www.youtube.com/watch?v=rWB5Hfo16KQ",
     "pdfUrl": "https://drive.google.com/file/d/1_2bl8VZjJjSas_7ZwKaOXRhPksSZDI35/view?usp=sharing",
     "pdfFile": "ganesha-1.pdf",
-    "ukuran": null
+    "ukuran": null,
+    "kelompok": "Ganesha"
   },
   {
     "id": "nandiswara",
@@ -25,7 +26,8 @@
     "videoUrl": "https://www.youtube.com/watch?v=0horA3xx5Rk",
     "pdfUrl": "https://drive.google.com/file/d/1RpBbRu0Ju84NTvDFIg2skcoUQZsJ1xa9/view?usp=sharing",
     "pdfFile": "nandiswara.pdf",
-    "ukuran": null
+    "ukuran": null,
+    "kelompok": "Siwa"
   },
   {
     "id": "dewa-ganesha",
@@ -39,7 +41,8 @@
     "videoUrl": "https://www.youtube.com/watch?v=rMGHc34otYY",
     "pdfUrl": "https://drive.google.com/file/d/1FrqfljUeifNcmUwWTTxpL1bE9WlR10tU/view?usp=sharing",
     "pdfFile": "dewa-ganesha.pdf",
-    "ukuran": null
+    "ukuran": null,
+    "kelompok": "Ganesha"
   },
   {
     "id": "siwa-bhairawa",
@@ -53,7 +56,8 @@
     "videoUrl": "https://www.youtube.com/watch?v=ho9oK3Vm2ZE",
     "pdfUrl": "https://drive.google.com/file/d/1D2_lH152qJKkH_2d-ZXVNYkls9dmF2xw/view?usp=sharing",
     "pdfFile": "siwa-bhairawa.pdf",
-    "ukuran": null
+    "ukuran": null,
+    "kelompok": "Siwa"
   },
   {
     "id": "dewa-siwa",
@@ -67,7 +71,8 @@
     "videoUrl": "https://www.youtube.com/watch?v=m0EnEVHzxqE",
     "pdfUrl": "https://drive.google.com/file/d/1AQXnc7yPFTVi1OmxasWVlbZ4Ke016s8a/view?usp=sharing",
     "pdfFile": "dewa-siwa.pdf",
-    "ukuran": "T 68 cm, L 28 cm, Tb 21,5 cm"
+    "ukuran": "T 68 cm, L 28 cm, Tb 21,5 cm",
+    "kelompok": "Siwa"
   },
   {
     "id": "figur-wanita",
@@ -81,7 +86,8 @@
     "videoUrl": "https://www.youtube.com/watch?v=b56BJoOKikY",
     "pdfUrl": "https://drive.google.com/file/d/1fjK0FhDx0LOgPGEfme8EV_Oge4S6rjFT/view?usp=sharing",
     "pdfFile": "figur-wanita.pdf",
-    "ukuran": "T 46 cm, L 19 cm, Tb 26 cm"
+    "ukuran": "T 46 cm, L 19 cm, Tb 26 cm",
+    "kelompok": "Dewi"
   },
   {
     "id": "siwa-mahaguru",
@@ -95,7 +101,8 @@
     "videoUrl": "https://www.youtube.com/watch?v=kg_CEu-CGLo",
     "pdfUrl": "https://drive.google.com/file/d/1u7RJohe4ZUtjVxamHSJVWXbSYE4dckOC/view?usp=sharing",
     "pdfFile": "siwa-mahaguru.pdf",
-    "ukuran": "T 62 cm, L 22 cm, Tb 19 cm"
+    "ukuran": "T 62 cm, L 22 cm, Tb 19 cm",
+    "kelompok": "Siwa"
   },
   {
     "id": "dewi-kesuburan",
@@ -109,7 +116,8 @@
     "videoUrl": "https://www.youtube.com/watch?v=ZKdvANvffUM",
     "pdfUrl": "https://drive.google.com/file/d/1IbljMh9yDmuIgVXO5LoHcM9FDecGr08T/view?usp=sharing",
     "pdfFile": "dewi-kesuburan.pdf",
-    "ukuran": null
+    "ukuran": null,
+    "kelompok": "Dewi"
   },
   {
     "id": "avalokitesvara",
@@ -123,7 +131,8 @@
     "videoUrl": "https://www.youtube.com/watch?v=WPBRW2CdnN0",
     "pdfUrl": "https://drive.google.com/file/d/1n5gXP7NvVNwvHGrlaANYlzZt1-1UMivk/view?usp=sharing",
     "pdfFile": "avalokitesvara.pdf",
-    "ukuran": "T 98 cm, L 68 cm, Tb 23 cm"
+    "ukuran": "T 98 cm, L 68 cm, Tb 23 cm",
+    "kelompok": "Buddha"
   },
   {
     "id": "ganesha-2",
@@ -137,7 +146,8 @@
     "videoUrl": "https://www.youtube.com/watch?v=E1fZaSzLekU",
     "pdfUrl": "https://drive.google.com/file/d/1QnfNn2u2A5fHEh2FmZZ8AwwFQomrprhO/view?usp=sharing",
     "pdfFile": "ganesha-2.pdf",
-    "ukuran": null
+    "ukuran": null,
+    "kelompok": "Ganesha"
   },
   {
     "id": "dwarapala",
@@ -151,7 +161,8 @@
     "videoUrl": "https://www.youtube.com/watch?v=80CBFBVtdmc",
     "pdfUrl": "https://drive.google.com/file/d/1cpSFC_WuN-8iywhhnitDmzXF1MZby_NT/view?usp=sharing",
     "pdfFile": "dwarapala.pdf",
-    "ukuran": null
+    "ukuran": null,
+    "kelompok": "Penjaga"
   },
   {
     "id": "ganesha-musika",
@@ -165,7 +176,8 @@
     "videoUrl": "https://www.youtube.com/watch?v=5j_DUIKmtHQ",
     "pdfUrl": "https://drive.google.com/file/d/15rD9OVeE2d9jYr-Mdls1sL0qN0vogvdG/view?usp=sharing",
     "pdfFile": "ganesha-musika.pdf",
-    "ukuran": "T 37 cm, L 24 cm, Tb 22,5 cm"
+    "ukuran": "T 37 cm, L 24 cm, Tb 22,5 cm",
+    "kelompok": "Ganesha"
   },
   {
     "id": "brahma",
@@ -179,6 +191,7 @@
     "videoUrl": "https://youtu.be/QhvBp6i_VGI",
     "pdfUrl": "https://drive.google.com/file/d/18m1lOYdudpJX1jb4ypzHjGCdXgXkjgXw/view?usp=sharing",
     "pdfFile": "brahma.pdf",
-    "ukuran": "T 159 cm, L 118 cm, Tb 75 cm"
+    "ukuran": "T 159 cm, L 118 cm, Tb 75 cm",
+    "kelompok": "Brahma"
   }
 ]

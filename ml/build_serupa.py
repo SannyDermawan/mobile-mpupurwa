@@ -93,7 +93,16 @@ def vektor_embedding(dokumen: list[str]) -> np.ndarray:
     from sentence_transformers import SentenceTransformer
 
     model = SentenceTransformer(EMBEDDING_MODEL)
-    return model.encode(dokumen, normalize_embeddings=True)
+    # Model ini hanya membaca ~128 token pertama tiap teks. Supaya seluruh isi PDF
+    # ikut terhitung, dokumen dipotong per ~80 kata, tiap potongan di-embed, lalu
+    # vektor potongan dirata-rata menjadi satu vektor per arca.
+    vektor = []
+    for dok in dokumen:
+        kata = dok.split()
+        potongan = [" ".join(kata[i : i + 80]) for i in range(0, max(len(kata), 1), 80)]
+        emb = model.encode(potongan, normalize_embeddings=True)
+        vektor.append(emb.mean(axis=0))
+    return np.array(vektor)
 
 
 def kemiripan(vektor: np.ndarray) -> np.ndarray:
@@ -129,6 +138,18 @@ def evaluasi(sim: np.ndarray, label: list[str], k: int) -> dict:
     return {"precision_at_k": round(float(np.mean(skor)), 4), "acak": round(float(np.mean(acak)), 4)}
 
 
+def evaluasi_kelompok(sim: np.ndarray, kelompok: list[str]) -> dict | None:
+    """Hit@1: apakah tetangga terdekat satu kelompok tokoh (Ganesha, Siwa, ...)?
+    Hanya arca yang kelompoknya punya anggota lain yang dihitung."""
+    n = len(kelompok)
+    ada = [i for i in range(n) if sum(1 for x in kelompok if x == kelompok[i]) > 1]
+    if not ada:
+        return None
+    hit = [kelompok[int(np.argmax(sim[i]))] == kelompok[i] for i in ada]
+    acak = [(sum(1 for x in kelompok if x == kelompok[i]) - 1) / (n - 1) for i in ada]
+    return {"hit1_kelompok": round(float(np.mean(hit)), 4), "hit1_acak": round(float(np.mean(acak)), 4), "jumlah_dinilai": len(ada)}
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--koleksi", default=str(ROOT / "assets/data/koleksi.json"))
@@ -146,6 +167,8 @@ def main() -> int:
         return 1
     ids = [str(k["id"]) for k in koleksi]
     label = [str(k.get("era", "")) for k in koleksi]
+    kelompok = [str(k.get("kelompok", "")) for k in koleksi]
+    punya_kelompok = all(kelompok)
 
     mentah, sumber = [], {}
     for item in koleksi:
@@ -172,10 +195,19 @@ def main() -> int:
     for nama, sim in sim_per_model.items():
         ringkasan[nama] = evaluasi(sim, label, args.top)
         print(f"  {nama:<10} {ringkasan[nama]['precision_at_k']:.2f}  (acak {ringkasan[nama]['acak']:.2f})")
+    if punya_kelompok:
+        print("\nEvaluasi (hit@1, tetangga terdekat satu kelompok tokoh):")
+        for nama, sim in sim_per_model.items():
+            ek = evaluasi_kelompok(sim, kelompok)
+            if ek:
+                ringkasan[nama].update(ek)
+                print(f"  {nama:<10} {ek['hit1_kelompok']:.2f}  (acak {ek['hit1_acak']:.2f}, {ek['jumlah_dinilai']} arca dinilai)")
 
     terpilih = args.model
     if terpilih == "auto":
-        terpilih = "embedding" if "embedding" in sim_per_model else "tfidf"
+        # pilih model dengan hit@1 kelompok tertinggi; seri -> embedding
+        nilai = {n: ringkasan[n].get("hit1_kelompok", ringkasan[n]["precision_at_k"]) for n in sim_per_model}
+        terpilih = max(nilai, key=lambda n: (nilai[n], n == "embedding"))
     sim = sim_per_model[terpilih]
     print(f"\nModel dipakai untuk aplikasi: {terpilih}")
 

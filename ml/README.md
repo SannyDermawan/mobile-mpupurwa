@@ -70,8 +70,12 @@ itu di proyek, lalu `flutter test`.
 
 ## Status data saat ini
 
-- 13 arca asli (foto dari kunjungan museum, PDF dari QR plakat). Ringkasan hasil TF-IDF ada di
-  `ml/hasil/evaluasi.json`; embedding belum dijalankan (perlu Colab).
+- 13 arca asli (foto dari kunjungan museum, PDF dari QR plakat). Hasil evaluasi ada di
+  `ml/hasil/evaluasi.json`. Metrik utama: **hit@1 kelompok tokoh** (field `kelompok` di
+  `koleksi.json`: Ganesha, Siwa, Dewi, ...), TF-IDF 0,80 dan embedding 0,70 dibanding acak
+  0,22 (10 arca dinilai). Precision@3 berdasarkan era hanya mendekati acak (0,54 dan 0,44 vs
+  0,41) karena 8 dari 13 arca satu era. `--model auto` memilih model dengan hit@1 tertinggi
+  (sekarang TF-IDF). Embedding sudah dijalankan lokal dengan `sentence-transformers`.
 - `avalokitesvara`: PDF hasil scan, teksnya ditranskripsi manual di `ml/data/teks/avalokitesvara.txt`.
 - `ganesha-2` memakai PDF yang identik dengan `dewa-ganesha`, dan PDF `figur-wanita` berupa esai
   umum. Ganti dengan PDF yang benar bila ada.

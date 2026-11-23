@@ -16,9 +16,15 @@ class KoleksiDetailViewModel {
 
   String get era => koleksi.era.toUpperCase();
 
-  String get ringkasan =>
-      'Koleksi paling istimewa Museum Mpu Purwa — satu-satunya '
-      '${koleksi.nama.toLowerCase()} berkendaraan tikus yang tercatat di Indonesia.';
+  /// Kalimat pengantar di bawah judul, disusun dari data arca itu sendiri.
+  String get ringkasan {
+    final bagian = <String>[
+      'Koleksi Museum Mpu Purwa',
+      if (koleksi.era.isNotEmpty) 'masa ${_judul(koleksi.era)}',
+      if (koleksi.periode.isNotEmpty) koleksi.periode,
+    ];
+    return '${bagian.join(' · ')}.';
+  }
 
   String get asal => _orDefault(koleksi.asal, 'Malang Raya');
   String get periode => _orDefault(koleksi.periode, 'Abad 13');
@@ -37,6 +43,9 @@ class KoleksiDetailViewModel {
 
   /// Membuka dokumen PDF koleksi. `true` kalau berhasil dibuka.
   Future<bool> openPdf() => _launcher.open(koleksi.pdfUrl!);
+
+  static String _judul(String teks) =>
+      teks.isEmpty ? teks : teks[0].toUpperCase() + teks.substring(1).toLowerCase();
 
   static String _orDefault(String value, String fallback) => value.isNotEmpty ? value : fallback;
 }
