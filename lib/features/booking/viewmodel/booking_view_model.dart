@@ -32,19 +32,32 @@ class BookingViewModel extends ChangeNotifier {
   BookingRequest? get latest => _requests.isEmpty ? null : _requests.first;
 
   /// Memuat riwayat pengajuan dari repository.
+  /// Kalau gagal (mis. tanpa sinyal), daftar yang sudah ada dipertahankan.
   Future<void> load() async {
-    final saved = await _repository.fetchAll();
-    _requests
-      ..clear()
-      ..addAll(saved);
-    notifyListeners();
+    try {
+      final saved = await _repository.fetchAll();
+      _requests
+        ..clear()
+        ..addAll(saved);
+      notifyListeners();
+    } on Object {
+      // Biarkan daftar lama; layar tetap bisa dipakai.
+    }
   }
 
   /// Menambah [request] ke daftar (langsung tampil) lalu menyimpannya.
+  /// Kalau penyimpanan/pengiriman gagal, pengajuan dikeluarkan lagi dari daftar
+  /// dan kesalahannya dilempar ulang supaya layar bisa memberi tahu pengguna.
   Future<void> submit(BookingRequest request) async {
     _requests.insert(0, request);
     notifyListeners();
-    await _repository.save(request);
+    try {
+      await _repository.save(request);
+    } on Object {
+      _requests.remove(request);
+      notifyListeners();
+      rethrow;
+    }
   }
 
   /// Membuat [BookingRequest] dari isian form (teks mentah dari View), lalu

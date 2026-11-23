@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../core/services/link_launcher.dart';
 import '../model/koleksi_model.dart';
 import '../viewmodel/koleksi_detail_view_model.dart';
-import 'widgets/koleksi_image.dart';
+import '../../../core/widgets/koleksi_image.dart';
 import 'widgets/koleksi_serupa_section.dart';
 
 /// Layar Detail Koleksi. Teks tampilan dan pembukaan tautan diatur

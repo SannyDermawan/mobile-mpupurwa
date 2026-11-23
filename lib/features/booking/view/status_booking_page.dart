@@ -17,27 +17,46 @@ import '../../../core/utils/tanggal_format.dart';
 /// Layar "Status Booking" (rute /status-booking): status, rincian, dan riwayat
 /// pengajuan booking rombongan. Kosong sampai pengguna mengirim pengajuan dari
 /// layar Booking Rombongan.
-// TODO(backend): muat daftar pengajuan dan statusnya dari server.
-class StatusBookingPage extends StatelessWidget {
+/// Saat dibuka (dan saat ditarik ke bawah) daftar dimuat ulang dari server
+/// supaya status yang diubah admin ikut tampil.
+class StatusBookingPage extends StatefulWidget {
   const StatusBookingPage({super.key});
 
   @override
+  State<StatusBookingPage> createState() => _StatusBookingPageState();
+}
+
+class _StatusBookingPageState extends State<StatusBookingPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) context.read<BookingViewModel>().load();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final requests = context.watch<BookingViewModel>().requests;
+    final vm = context.watch<BookingViewModel>();
+    final requests = vm.requests;
 
     return Scaffold(
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const AppTopBar(
-                title: 'Status Booking',
-                titleSize: 17,
-                fallbackRoute: AppRoutes.booking,
-              ),
-              if (requests.isEmpty) const _EmptyState() else _BookingContent(requests: requests),
-            ],
+        child: RefreshIndicator(
+          onRefresh: vm.load,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const AppTopBar(
+                  title: 'Status Booking',
+                  titleSize: 17,
+                  fallbackRoute: AppRoutes.booking,
+                ),
+                if (requests.isEmpty) const _EmptyState() else _BookingContent(requests: requests),
+              ],
+            ),
           ),
         ),
       ),

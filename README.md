@@ -18,7 +18,11 @@ Catatan:
 
 - Font (Fraunces dan Karla) diunduh lewat `google_fonts` saat pertama kali dipakai, jadi
   jalankan pertama kali dengan internet aktif.
-- Aplikasi belum memanggil backend. Semua data masih dummy (lihat bagian *Repository dummy*).
+- Secara bawaan aplikasi memakai data di `assets/data/` (13 arca asli) dan tidak memanggil server.
+  Untuk terhubung ke Web Admin: `flutter run --dart-define=API_BASE_URL=http://localhost:5000`
+  (emulator Android: `http://10.0.2.2:5000`). Koleksi, booking, dan check-in lalu lewat
+  `/api/public/*`; data bawaan menjadi cadangan bila server mati. Serah terima lengkap:
+  [docs/SERAH-TERIMA-INTEGRASI.md](docs/SERAH-TERIMA-INTEGRASI.md).
 - Masuk di mode demo: kode OTP 4 digit apa pun diterima.
 
 Perintah pemeriksaan:
@@ -180,9 +184,9 @@ XxxRepository` + `DummyXxxRepository` dengan data dari HTML), `viewmodel/xxx_vie
 untuk aplikasi mobile siap, buat implementasi yang memakai `ApiClient` (`core/network/`) dan
 ganti satu baris di `app.dart`; ViewModel dan View tidak perlu diubah.
 
-Kontrak dengan layar lain: **id koleksi** (`ganesya`, `brahma`, `catur`, `makara`, `prasasti`,
-`nandi`) dipakai untuk membuka `/koleksi/:id`. Beranda hanya memakai model kecilnya sendiri
-(`FeaturedCollection`); model koleksi lengkap milik Teman 1.
+Kontrak dengan layar lain: **id koleksi** (mis. `brahma`, `ganesha-1`, `dewa-siwa`; id dari
+database bila arca baru) dipakai untuk membuka `/koleksi/:id`. Beranda memakai model kecilnya
+sendiri (`FeaturedCollection`) yang diisi dari data koleksi lewat `KoleksiHomeRepository`.
 
 ## Aset gambar
 

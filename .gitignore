@@ -49,6 +49,8 @@ app.*.map.json
 
 # Bahan kuliah (laporan, screenshot laporan), bukan bagian aplikasi
 /docs/Laporan-*
+/docs/*.docx
+/docs/*.pdf
 /docs/screenshots/
 
 # ML: keluaran dan unduhan yang bisa dibuat ulang (lihat ml/README.md)

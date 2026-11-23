@@ -4,6 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_dimens.dart';
 import '../../../../core/theme/app_text_styles.dart';
 import '../../../../core/widgets/era_chip.dart';
+import '../../../../core/widgets/koleksi_image.dart';
 import '../../model/home_models.dart';
 
 /// Daftar kartu "Koleksi Unggulan" yang bisa digeser ke samping (`.hscroll`).
@@ -88,18 +89,8 @@ class _FeaturedArt extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final asset = item.imageAsset;
-    if (asset != null) {
-      return Image.asset(
-        asset,
-        fit: BoxFit.cover,
-        alignment: Alignment(0, item.imageFocusY * 2 - 1),
-        cacheWidth: 504, // 3x lebar kartu, cukup tajam dan hemat memori
-        semanticLabel: item.title,
-      );
-    }
-    // Tanpa foto: ikon emas di atas gradien gelap, seperti di HTML.
-    return const DecoratedBox(
+    // Tanpa foto (atau foto gagal dimuat): ikon emas di atas gradien gelap, seperti di HTML.
+    const placeholder = DecoratedBox(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment(-0.5, -0.87), // 150deg
@@ -113,6 +104,13 @@ class _FeaturedArt extends StatelessWidget {
           child: Icon(Icons.article_outlined, size: 44, color: AppColors.amber),
         ),
       ),
+    );
+    return KoleksiImage(
+      url: item.imageAsset ?? '',
+      alignment: Alignment(0, item.imageFocusY * 2 - 1),
+      cacheWidth: 504, // 3x lebar kartu, cukup tajam dan hemat memori
+      semanticLabel: item.title,
+      fallback: placeholder,
     );
   }
 }

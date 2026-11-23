@@ -48,7 +48,7 @@ abstract final class AppRoutes {
   static String koleksiDetail(String id) => '/koleksi/${Uri.encodeComponent(id)}';
 
   /// `/katalog?era=<era>`, mis. `/katalog?era=Tumapel`. Nilai era yang dikenal
-  /// di Katalog: Kanjuruhan, Tumapel, Singosari, Prasasti.
+  /// di Katalog: Kanjuruhan, Tumapel, Singosari, Majapahit, Prasasti (yang punya koleksi saja).
   static String katalogDenganEra(String era) =>
       Uri(path: katalog, queryParameters: {'era': era}).toString();
 }

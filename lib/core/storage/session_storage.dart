@@ -7,6 +7,7 @@ class SessionStorage {
 
   static const _keyLoggedIn = 'session.logged_in';
   static const _keyProfile = 'session.profile_json';
+  static const _keyBookingIds = 'booking.ids';
 
   final SharedPreferences _prefs;
 
@@ -21,6 +22,13 @@ class SessionStorage {
   String? get profileJson => _prefs.getString(_keyProfile);
 
   Future<void> saveProfileJson(String json) => _prefs.setString(_keyProfile, json);
+
+  /// Id booking yang diajukan dari perangkat ini. Server hanya memberi status
+  /// untuk id yang dipegang pengunjung, jadi id disimpan di sini.
+  List<String> get bookingIds => _prefs.getStringList(_keyBookingIds) ?? const [];
+
+  Future<void> addBookingId(String id) =>
+      _prefs.setStringList(_keyBookingIds, [id, ...bookingIds.where((e) => e != id)]);
 
   /// Menghapus semua data sesi (dipanggil saat logout).
   Future<void> clear() async {

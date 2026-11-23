@@ -233,7 +233,7 @@ void main() {
         'Tumapel',
       );
       expect(
-        KatalogViewModel(_FakeKoleksiRepository(), initialEra: 'Majapahit').selectedEra,
+        KatalogViewModel(_FakeKoleksiRepository(), initialEra: 'Mataram').selectedEra,
         KatalogViewModel.semua,
       );
     });

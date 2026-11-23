@@ -6,7 +6,7 @@ import '../../model/koleksi_serupa.dart';
 import '../../repository/koleksi_repository.dart';
 import '../../repository/serupa_repository.dart';
 import '../../viewmodel/koleksi_serupa_view_model.dart';
-import 'koleksi_image.dart';
+import '../../../../core/widgets/koleksi_image.dart';
 
 /// Bagian "Koleksi serupa" di bawah Detail Koleksi. Daftar arca dan skornya
 /// berasal dari model analisis teks (lihat `ml/build_serupa.py`).

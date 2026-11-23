@@ -7,9 +7,12 @@ import '../../../../core/widgets/app_button.dart';
 
 /// Kartu hero gelap di Beranda (`.hero`).
 class HomeHero extends StatelessWidget {
-  const HomeHero({super.key, required this.onExplore});
+  const HomeHero({super.key, required this.onExplore, this.total});
 
   final VoidCallback onExplore;
+
+  /// Jumlah koleksi di katalog; `null` kalau belum diketahui.
+  final int? total;
 
   @override
   Widget build(BuildContext context) {
@@ -67,7 +70,7 @@ class HomeHero extends StatelessWidget {
                       ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 250),
                         child: Text(
-                          '129 koleksi arca & prasasti, lengkap dengan sejarah, video, dan dokumen pendukung.',
+                          '${total == null ? 'Koleksi' : '$total koleksi'} arca & prasasti, lengkap dengan sejarah, video, dan dokumen pendukung.',
                           style: AppTextStyles.sans(13, color: AppColors.onDarkMuted, height: 1.5),
                         ),
                       ),

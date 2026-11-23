@@ -10,6 +10,7 @@ import '../../features/booking/view/booking_page.dart';
 import '../../features/booking/view/status_booking_page.dart';
 import '../../features/collections/model/koleksi_model.dart';
 import '../../features/collections/view/katalog_page.dart';
+import '../../features/collections/view/koleksi_detail_loader.dart';
 import '../../features/collections/view/koleksi_detail_page.dart';
 import '../../features/home/view/beranda_page.dart';
 import '../../features/info/view/info_page.dart';
@@ -94,10 +95,9 @@ GoRouter createAppRouter(AuthViewModel auth) {
                 name: AppRoutes.koleksiName,
                 builder: (context, state) {
                   final koleksi = state.extra as Koleksi?;
-                  if (koleksi == null) {
-                    return const KatalogScreen();
-                  }
-                  return KoleksiDetailPage(koleksi: koleksi);
+                  if (koleksi != null) return KoleksiDetailPage(koleksi: koleksi);
+                  // Dibuka dari id saja (mis. kartu unggulan Beranda): cari di data.
+                  return KoleksiDetailLoader(id: state.pathParameters['id'] ?? '');
                 },
               ),
             ],

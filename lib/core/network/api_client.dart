@@ -35,6 +35,31 @@ class ApiClient {
 
   Future<T> post<T>(String path, {Object? body}) => _send(() => _dio.post<T>(path, data: body));
 
+  /// Untuk API publik Web Admin (`/api/public/...`): semua balasannya berbentuk
+  /// `{ success, data, message? }`. Mengembalikan isi `data`; bila server menolak,
+  /// [ApiException.message] berisi pesan dari server (aman ditampilkan ke pengguna).
+  Future<dynamic> getJson(String path, {Map<String, String>? query}) =>
+      _envelope(() => _dio.get<dynamic>(path, queryParameters: query));
+
+  Future<dynamic> postJson(String path, Map<String, Object?> body) =>
+      _envelope(() => _dio.post<dynamic>(path, data: body));
+
+  Future<dynamic> _envelope(Future<Response<dynamic>> Function() request) async {
+    try {
+      final response = await request();
+      final body = response.data;
+      if (body is Map<String, dynamic> && body['success'] == true) return body['data'];
+      throw ApiException(_serverMessage(body) ?? 'Balasan server tidak dikenali.', statusCode: response.statusCode);
+    } on DioException catch (e) {
+      throw ApiException(_serverMessage(e.response?.data) ?? _messageFor(e), statusCode: e.response?.statusCode);
+    }
+  }
+
+  static String? _serverMessage(Object? body) {
+    final message = body is Map<String, dynamic> ? body['message'] : null;
+    return message is String && message.isNotEmpty ? message : null;
+  }
+
   Future<T> _send<T>(Future<Response<T>> Function() request) async {
     try {
       final response = await request();

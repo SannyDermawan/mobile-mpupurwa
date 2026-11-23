@@ -19,7 +19,8 @@ class FeaturedCollection {
   final String title;
   final String subtitle;
 
-  /// Foto kartu. `null` berarti kartu memakai ikon di atas latar gelap.
+  /// Foto kartu: jalur aset (`assets/...`) atau tautan internet. `null`/kosong berarti
+  /// kartu memakai ikon di atas latar gelap.
   final String? imageAsset;
 
   /// Posisi vertikal foto saat dipotong (`background-position: center N%`),
@@ -63,8 +64,11 @@ class EraInfo {
 
 /// Seluruh isi dinamis Beranda.
 class HomeContent {
-  const HomeContent({required this.featured, required this.eras});
+  const HomeContent({required this.featured, required this.eras, this.totalKoleksi});
 
   final List<FeaturedCollection> featured;
   final List<EraInfo> eras;
+
+  /// Jumlah seluruh koleksi di katalog; `null` kalau belum diketahui.
+  final int? totalKoleksi;
 }

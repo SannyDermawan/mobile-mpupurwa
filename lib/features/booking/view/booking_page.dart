@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
 import '../../../core/constants/museum_hours.dart';
+import '../../../core/network/api_client.dart';
 import '../../../core/router/app_routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_dimens.dart';
@@ -20,7 +21,7 @@ import '../viewmodel/booking_view_model.dart';
 ///
 /// Setelah lolos validasi, pengajuan disimpan ke [BookingViewModel] lalu
 /// pengguna dibawa ke layar Status Booking.
-// TODO(backend): kirim pengajuan ke server dan tunggu respons sebelum pindah layar.
+/// Dengan API aktif, pengajuan dikirim ke Web Admin dulu; layar baru pindah setelah berhasil.
 class BookingPage extends StatefulWidget {
   const BookingPage({super.key});
 
@@ -66,21 +67,31 @@ class _BookingPageState extends State<BookingPage> {
     });
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
-    context.read<BookingViewModel>().submitForm(
-      institution: _institution.text,
-      contactName: _contactName.text,
-      visitDate: _visitDate!,
-      participants: _participants.text,
-      phone: _phone.text,
-      notes: _notes.text,
-    );
-    ScaffoldMessenger.of(context).showSnackBar(
+    final messenger = ScaffoldMessenger.of(context);
+    final router = GoRouter.of(context);
+    try {
+      await context.read<BookingViewModel>().submitForm(
+        institution: _institution.text,
+        contactName: _contactName.text,
+        visitDate: _visitDate!,
+        participants: _participants.text,
+        phone: _phone.text,
+        notes: _notes.text,
+      );
+    } on ApiException catch (e) {
+      messenger.showSnackBar(SnackBar(content: Text('Pengajuan belum terkirim. ${e.message}')));
+      return;
+    } on Object {
+      messenger.showSnackBar(const SnackBar(content: Text('Pengajuan belum terkirim. Coba lagi.')));
+      return;
+    }
+    messenger.showSnackBar(
       const SnackBar(content: Text('Pengajuan dicatat. Status: Menunggu Konfirmasi.')),
     );
-    context.go(AppRoutes.statusBooking);
+    router.go(AppRoutes.statusBooking);
   }
 
   @override

@@ -9,13 +9,28 @@ class KatalogViewModel extends ChangeNotifier {
   /// [initialEra] berasal dari query `?era=` (mis. dari linimasa Beranda).
   /// Nilai yang tidak dikenal diabaikan, sehingga filter tetap "Semua".
   KatalogViewModel(this._repository, {String? initialEra}) {
-    final match = eraOptions.where((e) => e.toLowerCase() == initialEra?.toLowerCase());
+    final match = semuaEra.where((e) => e.toLowerCase() == initialEra?.toLowerCase());
     if (match.isNotEmpty) _selectedEra = match.first;
   }
 
   /// Pilihan chip era. "Semua" berarti tanpa filter era.
   static const String semua = 'Semua';
-  static const List<String> eraOptions = [semua, 'Kanjuruhan', 'Tumapel', 'Singosari', 'Prasasti'];
+  static const List<String> semuaEra = [
+    'Kanjuruhan',
+    'Tumapel',
+    'Singosari',
+    'Majapahit',
+    'Prasasti',
+  ];
+
+  /// Chip yang ditampilkan: "Semua" lalu hanya era yang punya koleksi, berurutan
+  /// kronologis. Sebelum data dimuat, semua era tampil agar filter dari
+  /// Beranda (`?era=`) tetap dikenali.
+  List<String> get eraOptions {
+    if (_all.isEmpty) return [semua, ...semuaEra];
+    final ada = {for (final k in _all) k.era.toLowerCase()};
+    return [semua, ...semuaEra.where((e) => ada.contains(e.toLowerCase()))];
+  }
 
   final KoleksiRepository _repository;
 
@@ -35,7 +50,8 @@ class KatalogViewModel extends ChangeNotifier {
     final query = _query.toLowerCase();
     return _all.where((item) {
       final matchesSearch = item.nama.toLowerCase().contains(query);
-      final matchesEra = _selectedEra == semua || item.era.toUpperCase() == _selectedEra.toUpperCase();
+      final matchesEra =
+          _selectedEra == semua || item.era.toUpperCase() == _selectedEra.toUpperCase();
       return matchesSearch && matchesEra;
     }).toList();
   }

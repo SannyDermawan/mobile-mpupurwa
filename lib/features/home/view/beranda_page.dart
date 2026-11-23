@@ -79,7 +79,7 @@ class _BerandaContent extends StatelessWidget {
             padding: EdgeInsets.fromLTRB(AppDimens.gutter, 0, AppDimens.gutter, 14),
             child: VisitBanner(),
           ),
-          HomeHero(onExplore: () => context.go(AppRoutes.katalog)),
+          HomeHero(total: content.totalKoleksi, onExplore: () => context.go(AppRoutes.katalog)),
           const SizedBox(height: 24),
           SectionHead(
             title: 'Koleksi Unggulan',
@@ -128,7 +128,9 @@ class _BerandaContent extends StatelessWidget {
               QuickAccessItem(
                 icon: Icons.grid_view_outlined,
                 title: 'Katalog Koleksi',
-                subtitle: '129 arca & prasasti',
+                subtitle: content.totalKoleksi == null
+                    ? 'Arca & prasasti'
+                    : '${content.totalKoleksi} arca & prasasti',
                 onTap: () => context.go(AppRoutes.katalog),
               ),
             ],

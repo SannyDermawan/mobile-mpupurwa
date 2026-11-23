@@ -5,7 +5,7 @@ import 'koleksi_detail_page.dart';
 import '../model/koleksi_model.dart';
 import '../repository/koleksi_repository.dart';
 import '../viewmodel/katalog_view_model.dart';
-import 'widgets/koleksi_image.dart';
+import '../../../core/widgets/koleksi_image.dart';
 
 /// Layar Katalog Koleksi. View hanya menampilkan state dari
 /// [KatalogViewModel] dan meneruskan ketikan pencarian serta pilihan era.
@@ -103,9 +103,9 @@ class _KatalogViewState extends State<_KatalogView> {
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                itemCount: KatalogViewModel.eraOptions.length,
+                itemCount: vm.eraOptions.length,
                 itemBuilder: (context, index) {
-                  final era = KatalogViewModel.eraOptions[index];
+                  final era = vm.eraOptions[index];
                   final isSelected = vm.selectedEra == era;
                   return Padding(
                     padding: const EdgeInsets.only(right: 8.0),
