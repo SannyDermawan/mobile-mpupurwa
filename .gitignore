@@ -46,3 +46,16 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Bahan kuliah (laporan, screenshot laporan), bukan bagian aplikasi
+/docs/Laporan-*
+/docs/screenshots/
+
+# ML: keluaran dan unduhan yang bisa dibuat ulang (lihat ml/README.md)
+/ml/hasil/
+/ml/data/pdf/*.pdf
+__pycache__/
+
+# File sesi/alat bantu
+android/.kotlin/
+.claude/

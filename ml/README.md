@@ -17,6 +17,10 @@ ml/hasil/evaluasi.json            hasil evaluasi (untuk laporan)
 assets/data/koleksi_serupa.json   hasil akhir yang dibaca aplikasi
 ```
 
+> `ml/data/pdf/*.pdf` dan `ml/hasil/` tidak ikut Git. Setelah clone jalankan
+> `python ml/unduh_pdf.py` untuk mengunduh PDF, lalu `python ml/build_serupa.py`
+> (juga membuat ulang `ml/hasil/`). `avalokitesvara` memakai transkripsi di `ml/data/teks/`.
+
 ## Cara menambah arca
 
 1. Tambah satu objek di `assets/data/koleksi.json` (salin yang sudah ada).
