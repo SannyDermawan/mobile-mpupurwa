@@ -4,6 +4,8 @@ import 'app.dart';
 import 'core/storage/session_storage.dart';
 import 'features/auth/repository/local_auth_repository.dart';
 import 'features/auth/viewmodel/auth_view_model.dart';
+import 'features/collections/repository/json_koleksi_repository.dart';
+import 'features/collections/repository/serupa_repository.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,5 +16,12 @@ Future<void> main() async {
   final authViewModel = AuthViewModel(LocalAuthRepository(storage));
   await authViewModel.restore();
 
-  runApp(MuseumApp(authViewModel: authViewModel));
+  // Data koleksi dan rekomendasi "Koleksi serupa" dibaca dari assets/data/.
+  runApp(
+    MuseumApp(
+      authViewModel: authViewModel,
+      koleksiRepository: JsonKoleksiRepository(),
+      serupaRepository: AssetSerupaRepository(),
+    ),
+  );
 }

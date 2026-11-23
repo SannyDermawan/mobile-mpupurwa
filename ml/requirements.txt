@@ -1,0 +1,5 @@
+numpy
+scikit-learn
+pypdf
+# Opsional, untuk embedding (lebih bagus untuk makna). Cocok dijalankan di Google Colab:
+# sentence-transformers

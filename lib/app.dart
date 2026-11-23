@@ -11,6 +11,7 @@ import 'features/booking/repository/booking_repository.dart';
 import 'features/booking/viewmodel/booking_view_model.dart';
 import 'features/collections/repository/dummy_koleksi_repository.dart';
 import 'features/collections/repository/koleksi_repository.dart';
+import 'features/collections/repository/serupa_repository.dart';
 import 'features/home/repository/home_repository.dart';
 import 'features/visit/repository/visit_repository.dart';
 import 'features/visit/viewmodel/visit_status_view_model.dart';
@@ -37,6 +38,7 @@ class MuseumApp extends StatefulWidget {
     required this.authViewModel,
     this.homeRepository,
     this.koleksiRepository,
+    this.serupaRepository,
     this.visitRepository,
     this.bookingRepository,
     this.linkLauncher,
@@ -46,6 +48,7 @@ class MuseumApp extends StatefulWidget {
 
   final HomeRepository? homeRepository;
   final KoleksiRepository? koleksiRepository;
+  final SerupaRepository? serupaRepository;
   final VisitRepository? visitRepository;
   final BookingRepository? bookingRepository;
   final LinkLauncher? linkLauncher;
@@ -56,6 +59,10 @@ class MuseumApp extends StatefulWidget {
 
 class _MuseumAppState extends State<MuseumApp> {
   late final GoRouter _router = createAppRouter(widget.authViewModel);
+  late final KoleksiRepository _koleksiRepository =
+      widget.koleksiRepository ?? const DummyKoleksiRepository();
+  late final SerupaRepository _serupaRepository =
+      widget.serupaRepository ?? AssetSerupaRepository();
   late final VisitRepository _visitRepository = widget.visitRepository ?? InMemoryVisitRepository();
 
   @override
@@ -70,9 +77,8 @@ class _MuseumAppState extends State<MuseumApp> {
       providers: [
         // --- Service & Repository (lapisan data) ---
         Provider<HomeRepository>.value(value: widget.homeRepository ?? const DummyHomeRepository()),
-        Provider<KoleksiRepository>.value(
-          value: widget.koleksiRepository ?? const DummyKoleksiRepository(),
-        ),
+        Provider<KoleksiRepository>.value(value: _koleksiRepository),
+        Provider<SerupaRepository>.value(value: _serupaRepository),
         Provider<VisitRepository>.value(value: _visitRepository),
         Provider<LinkLauncher>.value(value: widget.linkLauncher ?? const UrlLauncherService()),
 

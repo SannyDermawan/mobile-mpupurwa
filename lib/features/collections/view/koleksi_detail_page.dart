@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../../core/services/link_launcher.dart';
 import '../model/koleksi_model.dart';
 import '../viewmodel/koleksi_detail_view_model.dart';
+import 'widgets/koleksi_image.dart';
+import 'widgets/koleksi_serupa_section.dart';
 
 /// Layar Detail Koleksi. Teks tampilan dan pembukaan tautan diatur
 /// [KoleksiDetailViewModel]; View hanya menyusun widget.
 class KoleksiDetailPage extends StatelessWidget {
   final Koleksi koleksi;
 
-  const KoleksiDetailPage({
-    Key? key,
-    required this.koleksi,
-  }) : super(key: key);
+  const KoleksiDetailPage({Key? key, required this.koleksi}) : super(key: key);
 
   static const Color primaryGold = Color(0xFFD4A017);
   static const Color textDark = Color(0xFF1A1A1A);
@@ -29,8 +29,6 @@ class KoleksiDetailPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vm = KoleksiDetailViewModel(koleksi, context.read<LinkLauncher>());
-    final bool hasImage = vm.hasImage;
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: SingleChildScrollView(
@@ -46,27 +44,17 @@ class KoleksiDetailPage extends StatelessWidget {
                     width: double.infinity,
                     height: 380,
                     color: Colors.black12,
-                    child: hasImage
-                        ? Image.network(
-                            koleksi.fotoUrl,
-                            fit: BoxFit.cover,
-                            errorBuilder: (_, __, ___) => Container(
-                              color: const Color(0xFF1F1F1F),
-                              child: const Icon(
-                                Icons.all_inclusive_outlined,
-                                size: 80,
-                                color: primaryGold,
-                              ),
-                            ),
-                          )
-                        : Container(
-                            color: const Color(0xFF1F1F1F),
-                            child: const Icon(
-                              Icons.all_inclusive_outlined,
-                              size: 80,
-                              color: primaryGold,
-                            ),
-                          ),
+                    child: KoleksiImage(
+                      url: koleksi.fotoUrl,
+                      fallback: Container(
+                        color: const Color(0xFF1F1F1F),
+                        child: const Icon(
+                          Icons.all_inclusive_outlined,
+                          size: 80,
+                          color: primaryGold,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
 
@@ -83,11 +71,7 @@ class KoleksiDetailPage extends StatelessWidget {
                         color: Colors.black38,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
-                        Icons.chevron_left,
-                        color: Colors.white,
-                        size: 28,
-                      ),
+                      child: const Icon(Icons.chevron_left, color: Colors.white, size: 28),
                     ),
                   ),
                 ),
@@ -99,15 +83,8 @@ class KoleksiDetailPage extends StatelessWidget {
                   child: Container(
                     width: 40,
                     height: 40,
-                    decoration: const BoxDecoration(
-                      color: Colors.black38,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(
-                      Icons.share_outlined,
-                      color: Colors.white,
-                      size: 20,
-                    ),
+                    decoration: const BoxDecoration(color: Colors.black38, shape: BoxShape.circle),
+                    child: const Icon(Icons.share_outlined, color: Colors.white, size: 20),
                   ),
                 ),
 
@@ -116,10 +93,7 @@ class KoleksiDetailPage extends StatelessWidget {
                   bottom: 16,
                   left: 16,
                   child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
                       color: Colors.black.withOpacity(0.75),
                       borderRadius: BorderRadius.circular(8),
@@ -159,11 +133,7 @@ class KoleksiDetailPage extends StatelessWidget {
                   // Teks Ringkasan / Deskripsi Singkat
                   Text(
                     vm.ringkasan,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey.shade600,
-                      height: 1.4,
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.grey.shade600, height: 1.4),
                   ),
                   const SizedBox(height: 24),
 
@@ -180,17 +150,11 @@ class KoleksiDetailPage extends StatelessWidget {
                         Row(
                           children: [
                             Expanded(
-                              child: _buildSpecCell(
-                                label: "ASAL",
-                                value: vm.asal,
-                              ),
+                              child: _buildSpecCell(label: "ASAL", value: vm.asal),
                             ),
                             Container(width: 1, height: 60, color: borderGrey),
                             Expanded(
-                              child: _buildSpecCell(
-                                label: "PERIODE",
-                                value: vm.periode,
-                              ),
+                              child: _buildSpecCell(label: "PERIODE", value: vm.periode),
                             ),
                           ],
                         ),
@@ -199,17 +163,11 @@ class KoleksiDetailPage extends StatelessWidget {
                         Row(
                           children: [
                             Expanded(
-                              child: _buildSpecCell(
-                                label: "KERAJAAN",
-                                value: vm.kerajaan,
-                              ),
+                              child: _buildSpecCell(label: "KERAJAAN", value: vm.kerajaan),
                             ),
                             Container(width: 1, height: 60, color: borderGrey),
                             Expanded(
-                              child: _buildSpecCell(
-                                label: "MATERIAL",
-                                value: vm.material,
-                              ),
+                              child: _buildSpecCell(label: "MATERIAL", value: vm.material),
                             ),
                           ],
                         ),
@@ -231,11 +189,7 @@ class KoleksiDetailPage extends StatelessWidget {
                   const SizedBox(height: 12),
                   Text(
                     vm.sejarah,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.grey.shade700,
-                      height: 1.6,
-                    ),
+                    style: TextStyle(fontSize: 14, color: Colors.grey.shade700, height: 1.6),
                   ),
                   const SizedBox(height: 24),
 
@@ -278,6 +232,16 @@ class KoleksiDetailPage extends StatelessWidget {
                           ),
                       ],
                     ),
+                  const SizedBox(height: 28),
+
+                  // 6. Koleksi serupa (hasil analisis teks / ML)
+                  KoleksiSerupaSection(
+                    koleksiId: koleksi.id,
+                    onOpen: (item) => Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => KoleksiDetailPage(koleksi: item)),
+                    ),
+                  ),
                   const SizedBox(height: 30),
                 ],
               ),

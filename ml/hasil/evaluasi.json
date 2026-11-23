@@ -1,0 +1,25 @@
+{
+  "jumlah_arca": 13,
+  "k": 3,
+  "model": {
+    "tfidf": {
+      "precision_at_k": 0.5385,
+      "acak": 0.4103
+    }
+  },
+  "sumber_teks": {
+    "ganesha-1": "pdf",
+    "nandiswara": "pdf",
+    "dewa-ganesha": "pdf",
+    "siwa-bhairawa": "pdf",
+    "dewa-siwa": "pdf",
+    "figur-wanita": "pdf",
+    "siwa-mahaguru": "pdf",
+    "dewi-kesuburan": "pdf",
+    "avalokitesvara": "txt (PDF hasil scan, ditranskripsi manual)",
+    "ganesha-2": "pdf",
+    "dwarapala": "pdf",
+    "ganesha-musika": "pdf",
+    "brahma": "pdf"
+  }
+}

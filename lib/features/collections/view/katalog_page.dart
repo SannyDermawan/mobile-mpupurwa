@@ -5,6 +5,7 @@ import 'koleksi_detail_page.dart';
 import '../model/koleksi_model.dart';
 import '../repository/koleksi_repository.dart';
 import '../viewmodel/katalog_view_model.dart';
+import 'widgets/koleksi_image.dart';
 
 /// Layar Katalog Koleksi. View hanya menampilkan state dari
 /// [KatalogViewModel] dan meneruskan ketikan pencarian serta pilihan era.
@@ -195,14 +196,10 @@ class _KatalogViewState extends State<_KatalogView> {
                 ),
                 child: ClipRRect(
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-                  child: hasImage
-                      ? Image.network(
-                          item.fotoUrl,
-                          fit: BoxFit.cover,
-                          errorBuilder: (_, __, ___) =>
-                              _buildPlaceholderIcon(index: int.tryParse(item.id) ?? 1),
-                        )
-                      : _buildPlaceholderIcon(index: int.tryParse(item.id) ?? 1),
+                  child: KoleksiImage(
+                    url: item.fotoUrl,
+                    fallback: _buildPlaceholderIcon(index: int.tryParse(item.id) ?? 1),
+                  ),
                 ),
               ),
             ),
