@@ -3,7 +3,7 @@
 Dokumen ini ditulis oleh sesi Claude Code yang mengerjakan **aplikasi mobile**
 (`mobile-mpupurwa`) untuk sesi yang mengerjakan **Web Admin**
 (`website-admin-museum-mpu-purwa`). Salinan yang sama ada di kedua repositori.
-Terakhir diperbarui: 23 November 2026.
+Terakhir diperbarui: 23 November 2026 (data demo sudah dihapus dari DB lokal, lihat bagian 3).
 
 ```
 Aplikasi Flutter ──HTTP /api/public/*──►  Express (:5000) ──Prisma──► MySQL
@@ -81,19 +81,16 @@ Tanpa `API_BASE_URL` aplikasi memakai data bawaan sepenuhnya dan tidak memanggil
 
 ## 3. Keadaan database lokal saat ini
 
-Saya menjalankan `import-koleksi.ts` pada MySQL lokal: **12 arca dibuat, 1 diperbarui**
-(`Arca Brahma` demo ikut menjadi data asli). Isi `collections` sekarang **19 baris**:
+`import-koleksi.ts` sudah dijalankan pada MySQL lokal dan **5 data demo bawaan seed sudah dihapus**
+(`--hapus-demo`). Isi `collections` sekarang **14 baris**: 13 arca asli + 1 baris `Testing` milik
+pemilik proyek (punya foto/PDF di Vercel Blob; sengaja tidak saya hapus lewat skrip karena file
+Blob-nya tidak ikut terhapus; hapus lewat halaman Manajemen Koleksi). `Testing` masih tampil di
+Katalog aplikasi dan bisa terpilih sebagai koleksi unggulan di Beranda sampai dihapus.
 
-- 13 arca asli (dari saya),
-- 5 data demo bawaan seed (`Arca Ganesya Tikus`, `Siwa Catur Muka`, `Makara Gapura`,
-  `Prasasti Kanjuruhan`, `Arca Nandi`; tanpa foto, PDF palsu `example.com`),
-- 1 baris `Testing` milik pemilik proyek (punya foto/PDF di Vercel Blob).
-
-Akibatnya Katalog di aplikasi menampilkan demo lebih dulu (kartu hitam tanpa foto) dan
-Beranda memilih `Testing` sebagai unggulan. **Rekomendasi: hapus data demo + `Testing`** agar
-tampilan UAS bersih. Opsi: `npx tsx prisma/import-koleksi.ts --hapus-demo` (hanya menghapus 5
-nama demo di atas yang pdfUrl-nya kosong/`example.com`); `Testing` hapus lewat halaman
-Manajemen Koleksi. **Saya tidak menghapus apa pun.**
+Menjalankan ulang `import-koleksi.ts` aman (arca dicocokkan lewat nama; foto yang sudah diunggah
+lewat admin tidak ditimpa). Skrip seed (`npm run db:seed`) **menghapus semua tabel dan mengisi
+ulang dengan data demo**, jadi jangan dijalankan lagi kecuali ingin kembali ke data demo, lalu
+jalankan impor lagi.
 
 Data uji yang saya buat saat pengujian (2 booking, 2 check-in) sudah saya hapus lagi.
 
@@ -133,10 +130,17 @@ Data uji yang saya buat saat pengujian (2 booking, 2 check-in) sudah saya hapus 
 ## 5. Catatan untuk sesi Web Admin
 
 - Repo Web Admin saat saya kerjakan **punya perubahan belum di-commit milik sesi lain** (helmet,
-  logger, vercel.json, error pages, dll.). Saya **tidak meng-commit apa pun** di repo itu supaya
-  tidak ikut mengunci perubahan yang belum selesai. Berkas saya (daftar di bagian 1) masih
-  *untracked/modified*; `app.ts` hanya bertambah 2 baris saya di tengah perubahan Anda.
-  Silakan commit bersama perubahan Anda.
+  logger, vercel.json, error pages, dll.). Agar tidak ikut mengunci perubahan yang belum selesai,
+  bagian saya di-commit lewat *git worktree* terpisah pada branch **`feat/api-publik-mobile`**
+  (dari `main` 24ab850) dan di-push; branch `main` dan working tree Anda tidak disentuh.
+  Commit itu berisi: 3 berkas baru di `backend/src`, `backend/prisma/import-koleksi.ts`,
+  `backend/prisma/data/koleksi-asli.json`, README, dokumen ini, dan **hanya 2 baris saya** di
+  `app.ts` (tanpa helmet/logger Anda).
+- **Sebelum merge branch itu ke branch Anda**: salinan berkas saya masih ada di working tree Anda
+  sebagai *untracked* (`public.*`, `import-koleksi.ts`, dll.) dan `app.ts` Anda sudah memuat 2 baris
+  yang sama. Hapus salinan untracked itu (atau `git stash -u`) dan siap menyelesaikan konflik kecil
+  di `app.ts` (letak mount `/api/public` di antara `helmet()` dan `cors()`; versi Anda: tetap
+  `/api/public` sebelum `cors`).
 - Urutan middleware di `app.ts` penting: `/api/public` harus **sebelum** `cors({ origin:
   frontendUrl })`, kalau tidak preflight dijawab CORS khusus admin dan aplikasi web gagal.
 - Jika menambah endpoint publik baru, daftarkan di `public.routes.ts` dan jangan taruh di balik
